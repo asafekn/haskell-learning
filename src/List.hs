@@ -74,5 +74,8 @@ concatIntList xs ys =
 --
 --  reverseIntList (Node 1 (Node 2 Empty)) == Node 2 (Node 1 Empty)
 --
--- reverseIntList :: IntList -> IntList
--- reverseIntList xs =
+reverseIntList :: IntList -> IntList
+reverseIntList xs =
+	case xs of
+		Node a b -> concatIntList (reverseIntList b) (Node a Empty)
+		Empty -> Empty
