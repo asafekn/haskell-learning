@@ -1,89 +1,41 @@
 module List where
 
-import Prelude hiding ((<>), (:))
+import Prelude hiding (length, map, reverse, concat, fold)
 
-data IntList = Empty | (:::) Int IntList
-  deriving (Show, Eq)
+data List a = Empty | Node a (List a)
+	deriving (Show, Eq)
 
-infixr 8 :::
-infixr 2 <>
-
-data MaybeInt = NoInt | JustInt Int
-  deriving (Show, Eq)
-
-twoNumbers :: IntList
-twoNumbers = 1 ::: 2 ::: Empty
-
-anotherTwoNumbers :: IntList
-anotherTwoNumbers = 3 ::: (4 ::: Empty)
-
-intHead :: IntList -> MaybeInt
-intHead list =
-	case list of
-		n ::: xs -> JustInt n
-		Empty -> NoInt
-
-add1 :: Int -> Int
-add1 a = a + 1
-
-tripple :: Int -> Int
-tripple a = a * 3
-
-f :: Int -> (Int -> Int)
-f x =
-  if x > 10
-  then add1
-  else tripple
-
-lengthIntList :: IntList -> Int
-lengthIntList list =
-	case list of
-		a ::: b -> (1 + lengthIntList b)
+length :: List a -> Int
+length xs =
+	case xs of
+		Node a b -> 1 + length b
 		Empty -> 0
 
--- Get the last element of the list
---
---    lastIntList (1 ::: (2 ::: Empty)) == JustInt 2
---
-lastIntList :: IntList -> MaybeInt
-lastIntList list =
-	case list of
-		a ::: b -> case b of
-			c ::: d -> lastIntList b
-			Empty -> JustInt a
+map :: (a -> b) -> List a -> List b
+map = undefined
 
-		Empty -> NoInt
+concat :: List a -> List a -> List a
+concat = undefined
 
--- Apply function f to every element of the list
+reverse :: List a -> List a
+reverse = undefined
+
+-- Concat a list between each element of another list
 --
---     mapIntList tripple (1 ::: (2 ::: Empty)) == 3 ::: (6 ::: Empty)
+--  intercalate [1,2] [ [3,4], [5] ] == [3,4,1,2,5]
+--  intercalate "." [ "Asafe", "Klain" ] == "Asafe.Klain"
 --
-mapIntList :: (Int -> Int) -> IntList -> IntList
-mapIntList f xs =
+intercalate :: List a -> List (List a) -> List a
+
+--
+--   fold (\x y -> x + y) 5 (Node 1 (Node 2 Empty))
+--   fold (\x y -> x + y) ((\x y -> x + y) 1 5) (Node 2 Empty)
+--   fold (\x y -> x + y) 6 (Node 2 Empty)
+--   fold (\x y -> x + y) ((\x y -> x + y) 2 6) Empty
+--   fold (\x y -> x + y) 8 Empty
+--   8
+fold :: (a -> b -> b) -> b -> List a -> b
+fold f acc xs =
 	case xs of
-		a ::: b -> f a ::: mapIntList f b
-		Empty -> Empty
-
--- Merge two IntLists
---
---  concatIntList (1 ::: (2 ::: Empty)) (3 ::: (4 ::: Empty)) ==
---      1 ::: (2 ::: (3 ::: (4 ::: Empty)))
---
-concatIntList :: IntList -> IntList -> IntList
-concatIntList xs ys =
-	case xs of
-		a ::: b -> a ::: (concatIntList b ys)
-		Empty -> ys
-
-(<>) :: IntList -> IntList -> IntList
-(<>) = concatIntList
-
--- Return the reversed list
---
---  reverseIntList (1 ::: (2 ::: Empty)) == 2 ::: (1 ::: Empty)
---
-reverseIntList :: IntList -> IntList
-reverseIntList xs =
-	case xs of
-		a ::: b -> concatIntList (reverseIntList b) (a ::: Empty)
-		Empty -> Empty
+		Node y ys -> fold f (f y acc) ys
+		Empty -> acc

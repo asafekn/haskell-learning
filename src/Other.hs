@@ -1,16 +1,14 @@
 module Other where
 
-myVar :: Int
-myVar = 2
+data IntList
+  = EmptyInt
+  | NodeInt Int IntList
+  deriving (Show, Eq)
 
-add1 :: Int -> Int
-add1 a = a + 1
 
-tripple :: Int -> Int
-tripple a = a * 3
+data BoolList = EmptyBool | NodeBool Bool BoolList
 
-f x =
-  if x > 10
-  then add1
-  else tripple
+data List a = Empty | Node a (List a)
+  deriving (Show, Eq)
 
+listLength ::
